@@ -7,6 +7,7 @@ const express = require("express"); //require and use express()
 const app = express();
 
 const bodyParser = require("body-parser"); //require bodyParser to parese request.body 
+app.use(bodyParser.urlencoded({extended:true}));
 
 const path = require("path");
 
@@ -46,6 +47,8 @@ app.use(function(req,res,next){ //to recognize 404
 app.use(express.static(path.join(__dirname, 'views'))); //make /views static to use hbs 
 app.use(express.static(path.join(__dirname, 'public'))); //make /views static to use hbs 
 
+const data_service_auth = require('./data-service-authenticate.js');
+
 //todo: server routes 
 
 app.get('/', (req,res) => {
@@ -53,8 +56,24 @@ app.get('/', (req,res) => {
 })
 
 
+app.get('/register', (req, res) => {
+    res.render('register');
+});
+app.post("/register", (req,res) => {
+    console.log(req.body);
+    data_service_auth.registerUser(req.body)
+    .then(() => res.render("register", {successMessage: "User created!"}))
+    .catch((error) => res.render('register', {errorMessage: error}));
+});
+
 
 
 
 //let app listens to requests
-app.listen(HTTP_PORT, onHTTPStart);
+data_service_auth.initialize()
+.then(() => {
+    app.listen(HTTP_PORT, onHTTPStart);
+})
+.catch((error) => {
+    console.log(error);
+})
