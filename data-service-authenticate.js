@@ -29,16 +29,21 @@ let db; //to later reference the middleware
 var document_num = new Number; //to assign userID 
 var uri = 'mongodb+srv://Tue:tuechinhlatue1@seor.lbc4a.mongodb.net/SEOR?retryWrites=true&w=majority';
 
-//todo: return 0 if User is empty, userID of the last user
-countAllUser = function() {
+//todo: return 0 if User is empty, userID of the last user, query can be 'array' => return an array of user, 'userID' => return last user's ID
+module.exports.User_Query_Return = function(query) { //!'array' 'userID'
     return new Promise((resolve, reject) => {
         User.find()
         .exec()
         .then((allUser) => {
             console.log("allUser func: " + allUser.length);
-            if(allUser.length > 0)
+            if(allUser.length > 0 && query == 'userID')
                 resolve(allUser[allUser.length - 1].userID);
-            resolve(allUser.length);
+            else if(query == 'userID')
+                resolve(allUser.length);
+            else if(query == 'array')
+                resolve(allUser);
+            else 
+                reject("No query was given!");
         });
     });
 };
@@ -53,9 +58,12 @@ module.exports.initialize = function() {
             else {
                 console.log("Connect to mongoDB succeeds");
                 User = db.model("users", userSchema); //register User model using userSchema, use users collection to store
-                countAllUser().then((count) => { //assign resolve data to global var document_num
+
+                User_Query_Return('userID')
+                .then((count) => { //assign resolve data to global var document_num
                     document_num = count; 
-                });
+                }).catch((error) => console.log(error));
+
                 resolve();
             }     
         });
