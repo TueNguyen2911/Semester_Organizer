@@ -48,7 +48,7 @@ app.use(express.static(path.join(__dirname, 'views'))); //make /views static to 
 app.use(express.static(path.join(__dirname, 'public'))); //make /views static to use hbs 
 
 const data_service_auth = require('./data-service-authenticate.js');
-
+const data_service = require('./data-service.js')
 //todo: server routes 
 
 app.get('/', (req,res) => {
@@ -72,8 +72,10 @@ app.post("/register", (req,res) => {
 //let app listens to requests
 data_service_auth.initialize()
 .then(() => {
-    app.listen(HTTP_PORT, onHTTPStart);
+    data_service.Populate_Server_Users()
+    .then(() => app.listen(HTTP_PORT, onHTTPStart))
+    .catch((error) => console.log(error));
 })
 .catch((error) => {
     console.log(error);
-})
+});

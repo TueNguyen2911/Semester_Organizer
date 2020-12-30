@@ -35,7 +35,7 @@ module.exports.User_Query_Return = function(query) { //!'array' 'userID'
         User.find()
         .exec()
         .then((allUser) => {
-            console.log("allUser func: " + allUser.length);
+            console.log("allUser func export: " + allUser.length);
             if(allUser.length > 0 && query == 'userID')
                 resolve(allUser[allUser.length - 1].userID);
             else if(query == 'userID')
@@ -48,6 +48,23 @@ module.exports.User_Query_Return = function(query) { //!'array' 'userID'
     });
 };
 
+User_Query_Return = function(query) { //!'array' 'userID'
+    return new Promise((resolve, reject) => {
+        User.find()
+        .exec()
+        .then((allUser) => {
+            console.log("allUser func: " + allUser.length);
+            if(allUser.length > 0 && query == 'userID')
+                resolve(allUser[allUser.length - 1].userID);
+            else if(query == 'userID')
+                resolve(allUser.length);
+            else if(query == 'array')
+                resolve(allUser);
+            else 
+                reject("No query was given!");
+        });
+    });
+};
 
  //todo:connect, success => create tables
 module.exports.initialize = function() {
@@ -110,3 +127,4 @@ module.exports.registerUser = function(form_UserData) {
         }
     });
 };
+
