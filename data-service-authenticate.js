@@ -30,6 +30,7 @@ var document_num = new Number; //to assign userID
 var uri = 'mongodb+srv://Tue:tuechinhlatue1@seor.lbc4a.mongodb.net/SEOR?retryWrites=true&w=majority';
 
 //todo: return 0 if User is empty, userID of the last user, query can be 'array' => return an array of user, 'userID' => return last user's ID
+//! this User_Query_Return can't be used locally because it is exported 
 module.exports.User_Query_Return = function(query) { //!'array' 'userID'
     return new Promise((resolve, reject) => {
         User.find()
@@ -48,6 +49,7 @@ module.exports.User_Query_Return = function(query) { //!'array' 'userID'
     });
 };
 
+//!this function can be used locally within this module
 User_Query_Return = function(query) { //!'array' 'userID'
     return new Promise((resolve, reject) => {
         User.find()
