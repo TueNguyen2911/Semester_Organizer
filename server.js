@@ -55,7 +55,7 @@ app.get('/', (req,res) => {
     res.render('home');
 })
 
-
+//register route
 app.get('/register', (req, res) => {
     res.render('register');
 });
@@ -66,13 +66,24 @@ app.post("/register", (req,res) => {
     .catch((error) => res.render('register', {errorMessage: error}));
 });
 
+//login route
+app.get('/login', (req,res) => {
+    res.render('login');
+});
+app.post('/login', (req,res) => {
+    req.body.userAgent = req.get('User-Agent'); //save userAgent 
+    data_service_auth.checkUser(req.body)
+    .then((result_User) => {
+        res.render('manage', {user: result_User});
+    })
+})
 
 
 
 //let app listens to requests
 data_service_auth.initialize()
 .then(() => {
-    data_service.Populate_Server_Users()
+    data_service.initialize()
     .then(() => app.listen(HTTP_PORT, onHTTPStart))
     .catch((error) => console.log(error));
 })

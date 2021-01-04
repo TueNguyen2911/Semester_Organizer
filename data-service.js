@@ -19,15 +19,13 @@ var sequelize = new Sequelize("d6ourhnklg14k2", "thiybbuhjtndkl", "bd308a362baa1
     }
 );
 //todo: Define a 'User' model 
-const User = sequelize.define('users', {
+var User = sequelize.define('users', {
     userID: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         unique: true
     }
 });
-//todo: All_PG_Users is an array storing the difference between User in Mongo and User in PostGres
-var All_PG_Users = new Array;
 
 sequelize.authenticate() //connect to PostGre
     .then(() => console.log("connection PG success"))
@@ -40,34 +38,56 @@ sequelize.authenticate() //connect to PostGre
 getAllUsers = function() {
     return new Promise((resolve, reject) => {
         User.findAll()
-        .then((allPG_Users)=> {
-            resolve(allPG_Users);
+        .then((all_PG_Users)=> {
+            resolve(all_PG_Users);
         })
         .catch(() => reject('no result returned!'));
     })
 };
+//todo:synchronize the Database with our models and automatically add the table if it does not exist
+module.exports.initialize = function () 
+{
+    return new Promise(function (resolve, reject) {
+        sequelize.sync().then(() => {
+            Populate_Server_Users();
+            resolve(console.log("sync success"));
+        }).catch(() => {
+            reject("unable to sync the database");
+        })
+    });
+}
+
 //todo: Populate_Server_Users() determine the difference between Mongo User and PostGre User and then populate PostGre User table according to Mongo User
-module.exports.Populate_Server_Users = function() 
+Populate_Server_Users = function() 
 {
     return new Promise((resolve, reject) => {
         data_service_auth.User_Query_Return('array')
-        .then((allUsers) => {
-            console.log('allUsers: ' + allUsers);
+        .then((allMongoUsers) => {
+            let differentUsers = [];
+            
             getAllUsers()
             .then((all_PG_Users) => {
-                console.log('not yet');
-                console.log("all_pg: " + all_PG_Users);
-                All_PG_Users = all_PG_Users.slice(); 
-                
-            })
-            .catch((error) => console.log(error));
-
-            let differentUsers = [];
-            allUsers.forEach(Mongo_User => {
-                if(All_PG_Users.indexOf(Mongo_User.userID) < 0)
-                    differentUsers.push(Mongo_User.userID);
+                allMongoUsers.forEach(Mongo_User => {
+                    let flag = false;
+                    all_PG_Users.forEach(PG_User => {
+                        if(Mongo_User.userID != PG_User.userID)
+                            flag = false;
+                        else 
+                            flag = true;
+                    });
+                    if(!flag)
+                        differentUsers.push(Mongo_User.userID);
                 });
-            console.log('DU: ' + differentUsers);
+            });
+            console.log('\n diffUser: ' + differentUsers.length);
+
+            //create rows using differenUsers array
+            differentUsers.forEach(diff_userID => {
+                console.log(diff_userID);
+                User.create({userID: diff_userID})
+                .then(() => console.log('create diff user!'))
+                .catch(() => reject('unable to create user!'));
+            });
             resolve();
         })
         .catch(() => reject('PSU, Failed PGSQL'));

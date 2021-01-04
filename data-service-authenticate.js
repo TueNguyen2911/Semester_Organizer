@@ -24,8 +24,8 @@ var userSchema = new Schema({ //declaring User Schema
     }]
 });
 
-let User; //register the User model using userSchema schema, define globall
-let db; //to later reference the middleware
+let User; //register the User model using userSchema schema, define globally
+let db; //to later make reference to the database middleware
 var document_num = new Number; //to assign userID 
 var uri = 'mongodb+srv://Tue:tuechinhlatue1@seor.lbc4a.mongodb.net/SEOR?retryWrites=true&w=majority';
 
@@ -36,7 +36,6 @@ module.exports.User_Query_Return = function(query) { //!'array' 'userID'
         User.find()
         .exec()
         .then((allUser) => {
-            console.log("allUser func export: " + allUser.length);
             if(allUser.length > 0 && query == 'userID')
                 resolve(allUser[allUser.length - 1].userID);
             else if(query == 'userID')
@@ -129,4 +128,30 @@ module.exports.registerUser = function(form_UserData) {
         }
     });
 };
+
+//todo: check if User exists and resolve the User found
+module.exports.checkUser = function(userData) {
+    return new Promise ((resolve, reject) => {
+        User.findOne({'userName': userData.userName}).exec()
+        .then((theUser) => {
+            bcrypt.compare(userData.password, theUser.password) //use compare() to compare password to hashed password => return a promise
+            .then((result) => { //return the password, no catch
+                if(result) {
+                    theUser.loginHistory.push({
+                        'date-n-time': (new Date()).toString(),
+                        'userAgent': userData.userAgent
+                    });
+                    User.updateOne(
+                        {'userName': theUser.userName},
+                        {$set: {'loginHistory': theUser.loginHistory}}
+                    ).exec()
+                    .then(() => resolve(theUser))
+                    .catch((error) => reject('There was an error updating/verifying this user: ' + error));
+                }
+                else 
+                    reject('Unable to find user password: ' + userData.userName);
+            })
+        }).catch(() => reject('Unable to find user: ' + userData.userName));
+    });
+}
 
