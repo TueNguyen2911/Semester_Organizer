@@ -48,7 +48,26 @@ app.use(express.static(path.join(__dirname, 'views'))); //make /views static to 
 app.use(express.static(path.join(__dirname, 'public'))); //make /views static to use hbs 
 
 const data_service_auth = require('./data-service-authenticate.js');
-const data_service = require('./data-service.js')
+const data_service = require('./data-service.js');
+
+const clientSessions = require("client-sessions");
+app.use(clientSessions({
+    cookieName:"userSession", // this is the object name that will be added to "req"
+    secret: "SEORsecretisconfidential", //this should be a long-unguessable string.
+    duration: 2 * 60 * 1000, //duration of the session in milliseconds (2 mins)
+    activeDuration: 10000 * 60 //the session will be extended by this many milliseconds each request (10 min)
+}));
+app.use(function(req, res, next) {
+    res.locals.userSession = req.userSession;
+    next();
+});
+//todo: ensure user has logged in
+function ensureLogin(req, res, next)
+{
+    if (!req.userSession.user) {
+        res.redirect("/login");
+    } else { next();}
+}
 //todo: server routes 
 
 app.get('/', (req,res) => {
@@ -73,9 +92,26 @@ app.get('/login', (req,res) => {
 app.post('/login', (req,res) => {
     req.body.userAgent = req.get('User-Agent'); //save userAgent 
     data_service_auth.checkUser(req.body)
-    .then((result_User) => {
-        res.render('manage', {user: result_User});
+    .then((result_user) => {
+        req.userSession.user = {  // Add the user on the session and redirect them to the dashboard page.
+            userName: result_user.userName,
+            email: result_user.email, 
+            loginHistory: result_user.loginHistory 
+        }
+        res.redirect('/welcome');
     })
+    .catch((err) => {
+        res.render("login", {errorMessage: err, userName: req.body.userName})
+    });
+});
+
+app.get("/logout", (req,res) => {
+    req.userSession.reset();
+    res.redirect("/");
+});
+
+app.get('/welcome', ensureLogin, (req,res) => {
+    res.render("welcome", {user: req.userSession.user, layout: false});
 })
 
 
