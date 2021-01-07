@@ -3,6 +3,7 @@ const data_service_auth = require('./data-service-authenticate.js');
 const Sequelize = require("sequelize"); //middleware sequelize
 const { resolve } = require('path');
 const { rejects } = require('assert');
+const { type } = require('os');
 
 //todo: set up sequelize to point to SEOR PostGres database
 var sequelize = new Sequelize("d6ourhnklg14k2", "thiybbuhjtndkl", "bd308a362baa1061d3d213ab0ba4c50b654ea24515a84827058457f7357e5a87",
@@ -26,6 +27,18 @@ var User = sequelize.define('users', {
         unique: true
     }
 });
+//todo: Define a 'Semester' model
+// var Semester = sequelize.define('semesters', {
+//     SemID: {
+//         type: Sequelize.INTEGER,
+//         primaryKey: true,
+//         unique: true
+//     },
+//     Name: Sequelize.STRING,
+//     Start: Sequelize.DATE,
+//     Finish: Sequelize.DATE,
+//     userID: Sequelize.INTEGER
+// });
 
 sequelize.authenticate() //connect to PostGre
     .then(() => console.log("connection PG success"))
@@ -33,6 +46,10 @@ sequelize.authenticate() //connect to PostGre
         console.log("connection failed.");
         console.log(e);
     });
+
+
+
+
 
 //todo: getAllUsers() return an array of all users (contains userID only) in SEOR PostGre
 getAllUsers = function() {
@@ -93,3 +110,8 @@ Populate_Server_Users = function()
         .catch(() => reject('PSU, Failed PGSQL'));
     }); 
 }
+
+// //todo: 
+// module.exports.addSemester = function() {
+
+// }

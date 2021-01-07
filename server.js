@@ -2,7 +2,7 @@ var HTTP_PORT = process.env.PORT || 8080;
 function onHTTPStart() { 
     console.log("Express http server listening on " + HTTP_PORT);
 }
-
+var user;
 const express = require("express"); //require and use express()
 const app = express();
 
@@ -18,9 +18,9 @@ app.engine('.hbs', exphbs({ //create handlebar engine to handle HTML files
     runtimeOptions: {   //to fix not property of bug
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true,
-    },
+    }, //helper functions 
     helpers: {
-        navLink: function(url, options){
+        navLink: function(url, options){     
             return '<li' +
             ((url == app.locals.activeRoute) ? ' class="active" ' : '') +
             '><a href=" ' + url + ' ">' + options.fn(this) + '</a></li>'; },
@@ -55,7 +55,7 @@ app.use(clientSessions({
     cookieName:"userSession", // this is the object name that will be added to "req"
     secret: "SEORsecretisconfidential", //this should be a long-unguessable string.
     duration: 2 * 60 * 1000, //duration of the session in milliseconds (2 mins)
-    activeDuration: 10000 * 60 //the session will be extended by this many milliseconds each request (10 min)
+    activeDuration: 1000 * 60 //the session will be extended by this many milliseconds each request (10 min)
 }));
 app.use(function(req, res, next) {
     res.locals.userSession = req.userSession;
@@ -92,13 +92,13 @@ app.get('/login', (req,res) => {
 app.post('/login', (req,res) => {
     req.body.userAgent = req.get('User-Agent'); //save userAgent 
     data_service_auth.checkUser(req.body)
-    .then((result_user) => {
-        req.userSession.user = {  // Add the user on the session and redirect them to the dashboard page.
-            userName: result_user.userName,
-            email: result_user.email, 
-            loginHistory: result_user.loginHistory 
+    .then((user) => {
+        req.userSession.user = {  // Add the user on the session and redirect
+            userName: user.userName,
+            userID: user.userID,
         }
-        res.redirect('/welcome');
+        console.log('nice');
+        res.redirect('/semesters');
     })
     .catch((err) => {
         res.render("login", {errorMessage: err, userName: req.body.userName})
@@ -110,11 +110,10 @@ app.get("/logout", (req,res) => {
     res.redirect("/");
 });
 
-app.get('/welcome', ensureLogin, (req,res) => {
-    res.render("welcome", {user: req.userSession.user, layout: false});
+app.get('/semesters', ensureLogin, (req,res) => {
+    console.log('yeah');
+    res.render("semesters"); 
 })
-
-
 
 //let app listens to requests
 data_service_auth.initialize()

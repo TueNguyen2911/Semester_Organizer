@@ -28,6 +28,7 @@ let User; //register the User model using userSchema schema, define globally
 let db; //to later make reference to the database middleware
 var document_num = new Number; //to assign userID 
 var uri = 'mongodb+srv://Tue:tuechinhlatue1@seor.lbc4a.mongodb.net/SEOR?retryWrites=true&w=majority';
+var current_userID;
 
 //todo: return 0 if User is empty, userID of the last user, query can be 'array' => return an array of user, 'userID' => return last user's ID
 //! this User_Query_Return can't be used locally because it is exported 
@@ -145,7 +146,11 @@ module.exports.checkUser = function(userData) {
                         {'userName': theUser.userName},
                         {$set: {'loginHistory': theUser.loginHistory}}
                     ).exec()
-                    .then(() => resolve(theUser))
+                    .then(() => {
+                        current_userID = theUser.userID;
+                        resolve(theUser);
+
+                    })
                     .catch((error) => reject('There was an error updating/verifying this user: ' + error));
                 }
                 else 
@@ -153,5 +158,10 @@ module.exports.checkUser = function(userData) {
             })
         }).catch(() => reject('Unable to find user: ' + userData.userName));
     });
+}
+
+//todo: 
+module.exports.getCurrentUserID = function() {
+    return current_userID;
 }
 
