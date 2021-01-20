@@ -1,18 +1,22 @@
+var is_open;
 $(document).ready(function() {
     $("form#semester-form").css("display", "none");
+    $("form#course-form").css("display", "none"); 
 });
 
-var is_open = false;
-function openForm() {
-    if(!is_open)
-    {
-        $("form#semester-form").css("display", "block");  
-        is_open = true;
-    }
+function openSemForm() {
+    $("form#semester-form").css("display", "block");  
 }
-function closeForm() {
-    if(is_open) {
-        $("form#semester-form").css("display", "none");  
-        is_open = false;
-    }
+function closeSemForm() {
+    $("form#semester-form").css("display", "none");  
+}
+
+function openCourseForm() {
+    $("form#course-form").css("display", "block");  
+
+}
+
+function closeCourseForm() {
+    $("form#course-form").css("display", "none");  
+
 }

@@ -137,7 +137,10 @@ app.post('/semesters/add', (req,res) => {
         res.redirect('/semesters') 
     });
 })
-
+//courses routes 
+app.get('/courses', ensureLogin, (req,res) => {
+    res.render('courses');
+});
 //let app listens to requests
 data_service_auth.initialize()
 .then(() => {

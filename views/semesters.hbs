@@ -8,7 +8,7 @@
             <tbody>
                 {{#each semester_data}} 
                 <tr>
-                    <td> <a href="#" class="semester-link"> <span style="font-weight: bold;">{{this.Name}}</span> ({{this.Start}} <span class="glyphicon glyphicon-arrow-right" style="color: #FF0000; opacity: 0.5;"></span> {{this.Finish}}) </a></td>
+                    <td> <a href="/courses" class="semester-link"> <span style="font-weight: bold;">{{this.Name}}</span> ({{this.Start}} <span class="glyphicon glyphicon-arrow-right" style="color: #FF0000; opacity: 0.5;"></span> {{this.Finish}}) </a></td>
                 </tr>
                 {{/each}}
             </tbody>
@@ -17,7 +17,7 @@
     <br>
     <div class='container'>
         <div class='row'>
-            <button class="glyphicon glyphicon-plus add-new-sem" onclick="openForm();"></button>  Add a new semester 
+            <button class="glyphicon glyphicon-plus add-new-sem" onclick="openSemForm();"></button>  Add a new semester 
         </div>
     </div>
 
@@ -25,19 +25,19 @@
 
     <form id="semester-form" method="post" action="/semesters/add">
         <div class="form-group">
-            <label for="Name" class="sr-only">Semester Name</label>
+            <label for="Name">Semester Name:</label>
             <input class="form-control" id="Name" name="Name" type="text" placeholder="Semester 1, Fall 2020, etc" value="" required/>
         </div>
         <div class="form-group">
-            <label for="Start" class="sr-only">Start date</label>
+            <label for="Start">Start date:</label>
             <input class="form-control" id="Start" name="Start" type="date" min="2015-01-01" max="2026-01-01" required/>
         </div>
         <div class="form-group">
-            <label for="Finish" class="sr-only">End date</label>
+            <label for="Finish">End date:</label>
             <input class="form-control" id="Finish" name="Finish" type="date" min="2015-01-01" max="2026-01-01" required/>
         </div>
     <button type="submit" class="btn btn-success pull-right">Submit</button> 
-    <button id="cancel" class="btn btn-warning pull-right" type="reset" onclick="closeForm();">Cancel</button>
+    <button id="cancel" class="btn btn-warning pull-right" type="reset" onclick="closeSemForm();">Cancel</button>
   </form>
 
 </body>

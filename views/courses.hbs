@@ -1,0 +1,46 @@
+<title>
+    Welcome
+</title>
+<body> 
+    <h1> It's </h1>
+    <div class="table-responsive"> <!-- css -->
+        <table class="table table-bordered table-hover semester-table">
+            <tbody>
+                <tr>
+                    <td> <a>BTP300-C++</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <div class='container'>
+        <div class='row'>
+            <button class="glyphicon glyphicon-plus add-new-course" onclick="openCourseForm();"></button>  Add a new course
+        </div>
+    </div>
+
+    <br>
+
+    <form id="course-form" method="post" action="/courses/add">
+    <div class="form-group">
+            <label for="CourseCode" >Course Code</label>
+            <input class="form-control" id="CourseCode" name="CourseCode" type="text" placeholder="BTP300, BTS430NAA" value="" required/>
+        </div>
+        <div class="form-group">
+            <label for="CourseName">Course Name</label>
+            <input class="form-control" id="CourseName" name="CourseName" type="text" placeholder="Object-oriented Java" value="" required/>
+        </div>
+        <div class="form-group">
+            <label for="CourseDesc">Course Description:</label>
+            <input class="form-control" id="CourseDesc" name="CourseDesc" type="text" placeholder="A course on how to code in Java using OOP concepts" value=""/>
+        </div>
+        <div class="form-group">
+            <label for="Prof">Professor Name:</label>
+            <input class="form-control" id="Prof" name="Prof" type="text" placeholder="Cornel Barna, you gotta remember your prof's name :D" value="" required/>
+        </div>
+        
+    <button type="submit" class="btn btn-success pull-right">Submit</button> 
+    <button id="cancel" class="btn btn-warning pull-right" type="reset" onclick="closeCourseForm();">Cancel</button>
+  </form>
+
+</body>
