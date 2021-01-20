@@ -28,27 +28,26 @@ var User = sequelize.define('users', {
     }
 });
 //todo: Define a 'Semester' model
-// var Semester = sequelize.define('semesters', {
-//     SemID: {
-//         type: Sequelize.INTEGER,
-//         primaryKey: true,
-//         unique: true
-//     },
-//     Name: Sequelize.STRING,
-//     Start: Sequelize.DATE,
-//     Finish: Sequelize.DATE,
-//     userID: Sequelize.INTEGER
-// });
+var Semester = sequelize.define('semesters', {
+    SemID: {
+        type: Sequelize.NUMBER,
+        primaryKey: true,
+        unique: true
+    },
+    Name: Sequelize.STRING,
+    Start: Sequelize.DATEONLY,
+    Finish: Sequelize.DATEONLY,
+    userID: Sequelize.NUMBER
+});
 
 sequelize.authenticate() //connect to PostGre
     .then(() => console.log("connection PG success"))
     .catch((e) => {
         console.log("connection failed.");
-        console.log(e);
     });
 
-
-
+//todo: all global variables in this module
+var current_userID;
 
 
 //todo: getAllUsers() return an array of all users (contains userID only) in SEOR PostGre
@@ -96,11 +95,11 @@ Populate_Server_Users = function()
                         differentUsers.push(Mongo_User.userID);
                 });
             });
-            console.log('\n diffUser: ' + differentUsers.length);
+            //console.log('\n diffUser: ' + differentUsers.length);
 
             //create rows using differenUsers array
             differentUsers.forEach(diff_userID => {
-                console.log(diff_userID);
+                //console.log(diff_userID);
                 User.create({userID: diff_userID})
                 .then(() => console.log('create diff user!'))
                 .catch(() => reject('unable to create user!'));
@@ -111,7 +110,52 @@ Populate_Server_Users = function()
     }); 
 }
 
-// //todo: 
-// module.exports.addSemester = function() {
+//todo: get current userID from cookies
+module.exports.getCurrentUserID = function(cookies_user_id) {
+    console.log(cookies_user_id);
+    current_userID = cookies_user_id; //assign global variable current_userID to userID saved by cookies
+}
 
-// }
+
+//todo: add a Semester
+module.exports.addSemester = function(semesterData) {
+    return new Promise((resolve, reject) => {
+        let lastSemID = 0;
+    
+        Semester.findAll()
+        .then((allSemester) => {
+            if(allSemester.length == 0)
+                console.log('\nSemester is empty\n');
+            else 
+                lastSemID = allSemester[allSemester.length - 1].SemID; //assign semID
+            
+            semesterData.SemID = (lastSemID + 1); //assign semID
+            console.log('current: ' + current_userID);
+            semesterData.userID = current_userID;
+            Semester.create(semesterData) 
+            .then(() => {
+                console.log('\n new sem created \n');
+                resolve(); 
+            })
+            .catch((err) => {
+                console.log('\n can\'t create new sem');
+                reject(err); 
+            });
+        })
+        .catch((error) => {
+            console.log(error);
+        }) 
+    });
+}
+//todo: resolve an array of all Semester records 
+module.exports.getAllSemesters = function() {
+    return new Promise((resolve, reject) => {
+        console.log(current_userID);
+        Semester.findAll(
+            {where: {userID: current_userID}}
+        )
+        .then((allSemester) => {
+            resolve(allSemester);
+        })
+    })
+}

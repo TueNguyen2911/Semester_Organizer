@@ -160,8 +160,5 @@ module.exports.checkUser = function(userData) {
     });
 }
 
-//todo: 
-module.exports.getCurrentUserID = function() {
-    return current_userID;
-}
+
 

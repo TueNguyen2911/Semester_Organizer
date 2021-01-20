@@ -2,7 +2,7 @@ var HTTP_PORT = process.env.PORT || 8080;
 function onHTTPStart() { 
     console.log("Express http server listening on " + HTTP_PORT);
 }
-var user;
+
 const express = require("express"); //require and use express()
 const app = express();
 
@@ -54,8 +54,8 @@ const clientSessions = require("client-sessions");
 app.use(clientSessions({
     cookieName:"userSession", // this is the object name that will be added to "req"
     secret: "SEORsecretisconfidential", //this should be a long-unguessable string.
-    duration: 2 * 60 * 1000, //duration of the session in milliseconds (2 mins)
-    activeDuration: 1000 * 60 //the session will be extended by this many milliseconds each request (10 min)
+    duration: 2 * 60 * 10000, //duration of the session in milliseconds (2 mins)
+    activeDuration: 10000 * 60 //the session will be extended by this many milliseconds each request (10 min)
 }));
 app.use(function(req, res, next) {
     res.locals.userSession = req.userSession;
@@ -69,12 +69,12 @@ function ensureLogin(req, res, next)
     } else { next();}
 }
 //todo: server routes 
-
+//home route
 app.get('/', (req,res) => {
     res.render('home');
 })
 
-//register route
+//register routes
 app.get('/register', (req, res) => {
     res.render('register');
 });
@@ -85,7 +85,7 @@ app.post("/register", (req,res) => {
     .catch((error) => res.render('register', {errorMessage: error}));
 });
 
-//login route
+//login routes
 app.get('/login', (req,res) => {
     res.render('login');
 });
@@ -104,15 +104,38 @@ app.post('/login', (req,res) => {
         res.render("login", {errorMessage: err, userName: req.body.userName})
     });
 });
-
+//logout route
 app.get("/logout", (req,res) => {
     req.userSession.reset();
     res.redirect("/");
 });
-
+//semester routes
 app.get('/semesters', ensureLogin, (req,res) => {
-    console.log('yeah');
-    res.render("semesters"); 
+    data_service.getCurrentUserID(req.userSession.user.userID);
+    data_service.getAllSemesters()
+    .then((allSems) => {
+        //console.log('\n\n\n\n' + allSems.length + '\n\n\n\n');
+        if(allSems.length > 0) 
+        {
+            allSems.forEach(aSem => {
+                aSem["Start"] = aSem["Start"].toDateString(); //formatting for displaying 
+                aSem["Finish"] = aSem["Finish"].toDateString();
+            });
+            res.render('semesters', {semester_data: allSems, layout: 'main'});
+        }
+        else 
+            res.render('semesters');
+    })
+    
+})
+app.post('/semesters/add', (req,res) => {
+    data_service.getCurrentUserID(req.userSession.user.userID);
+    data_service.addSemester(req.body)
+    .then(() => res.redirect('/semesters'))
+    .catch((msg) => { 
+        console.log(msg);
+        res.redirect('/semesters') 
+    });
 })
 
 //let app listens to requests

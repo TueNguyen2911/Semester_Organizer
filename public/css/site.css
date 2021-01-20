@@ -1,11 +1,38 @@
 body {
     background-color:  	#fff2e5;
 }
-/* nav[class="navbar-default"] {
-    position: fixed;
+
+.semester-table {
+    font-size: xx-large;
+    border-collapse: separate;
+    border-spacing: 0 10px;
 }
-ul[class~="navbar-nav"] li:hover {
-    -webkit-transform: rotateZ(-30deg);
-    -ms-transform: rotateZ(-30deg);
-    transform: rotateZ(-30deg);
-} */
+table.semester-table > tbody > tr > td {
+    background-image: url(/media/semseter-background.png);
+}
+@media only screen and (max-width: 600px) {
+    .semester-table {
+        font-size: large;
+    }
+  }
+a.semester-link {
+    text-decoration: none;
+    color: black;
+    padding: 5px 0 5px 0;
+}
+.semester-table>tbody>tr>td, .semester-table>tbody>tr>th, .semester-table>tfoot>tr>td, .semester-table>tfoot>tr>th, .semester-table>thead>tr>td, .semester-table>thead>tr>th {
+    padding: 20px;
+}
+table.table-bordered > tbody > tr > td{
+    border:1px solid black;
+    background-color: white;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    background-color: #F5FA86;
+
+}
+
+#semester-form {
+    display: none;
+}
