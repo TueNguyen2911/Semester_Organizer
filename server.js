@@ -1,3 +1,4 @@
+
 var HTTP_PORT = process.env.PORT || 8080;   
 function onHTTPStart() { 
     console.log("Express http server listening on " + HTTP_PORT);
@@ -104,6 +105,7 @@ app.post('/login', (req,res) => {
         res.render("login", {errorMessage: err, userName: req.body.userName})
     });
 });
+
 //logout route
 app.get("/logout", (req,res) => {
     req.userSession.reset();
@@ -128,6 +130,10 @@ app.get('/semesters', ensureLogin, (req,res) => {
     })
     
 })
+app.get('/semesters/:semNum', ensureLogin, (req,res) => {
+    req.userSession.user.ChosenSemID = req.params.semNum;
+    res.redirect('/courses');
+});
 app.post('/semesters/add', (req,res) => {
     data_service.getCurrentUserID(req.userSession.user.userID);
     data_service.addSemester(req.body)
@@ -137,10 +143,37 @@ app.post('/semesters/add', (req,res) => {
         res.redirect('/semesters') 
     });
 })
+app.post('/courses/add', ensureLogin, (req,res) => {
+    data_service.addCourse(req.body, req.userSession.user.ChosenSemID)
+    .then((res.redirect('/courses/')));
+});
+
 //courses routes 
 app.get('/courses', ensureLogin, (req,res) => {
-    res.render('courses');
+    data_service.getCoursesBySemID(req.userSession.user.ChosenSemID)
+    .then((Courses) => {
+        res.render('courses', {course_data: Courses});
+    })
+})
+app.get('/course/:courseID', ensureLogin, (req,res) => {
+    req.userSession.user.ChosenCourseID = req.params.courseID;
+    res.redirect('/assignments');
+})
+
+//assignment routes 
+app.get('/assignments', ensureLogin, (req,res) => {
+    data_service.getAssignmentByCourseID(req.userSession.user.ChosenCourseID)
+    .then((Assignments) => {
+        res.render('assignments', {assignment_data: Assignments});
+    })
+
 });
+app.post('/assignments/add',ensureLogin, (req,res) => {
+    data_service.addAssignment(req.body, req.userSession.user.ChosenCourseID)
+    .then(() => res.redirect('/assignments'))
+    .catch((error) => console.log("\n\n\n" + error));
+})
+
 //let app listens to requests
 data_service_auth.initialize()
 .then(() => {

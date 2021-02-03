@@ -36,3 +36,7 @@ table.table-bordered > tbody > tr > td{
 #semester-form {
     display: none;
 }
+
+.list-group-item {
+    padding: 30px;
+}

@@ -8,7 +8,7 @@
             <tbody>
                 {{#each semester_data}} 
                 <tr>
-                    <td> <a href="/courses" class="semester-link"> <span style="font-weight: bold;">{{this.Name}}</span> ({{this.Start}} <span class="glyphicon glyphicon-arrow-right" style="color: #FF0000; opacity: 0.5;"></span> {{this.Finish}}) </a></td>
+                    <td> <a href="/semesters/{{this.SemID}}" class="semester-link"> <span style="font-weight: bold;">{{this.Name}}</span> ({{this.Start}} <span class="glyphicon glyphicon-arrow-right" style="color: #FF0000; opacity: 0.5;"></span> {{this.Finish}}) </a></td>
                 </tr>
                 {{/each}}
             </tbody>

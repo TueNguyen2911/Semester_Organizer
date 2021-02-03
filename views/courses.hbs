@@ -2,13 +2,19 @@
     Welcome
 </title>
 <body> 
-    <h1> It's </h1>
+    <h1> It's {{userSession.user.ChosenSemID}}</h1>
+
     <div class="table-responsive"> <!-- css -->
         <table class="table table-bordered table-hover semester-table">
             <tbody>
                 <tr>
-                    <td> <a>BTP300-C++</a></td>
+                    <td> <a>BTP300-C++</a> </td>
                 </tr>
+                {{#each course_data}}
+                <tr>
+                    <td> <a href='/course/{{this.CourseID}}'>{{this.CourseName}} ({{this.CourseCode}})</a></td>
+                </tr>
+                {{/each}}
             </tbody>
         </table>
     </div>
@@ -31,8 +37,8 @@
             <input class="form-control" id="CourseName" name="CourseName" type="text" placeholder="Object-oriented Java" value="" required/>
         </div>
         <div class="form-group">
-            <label for="CourseDesc">Course Description:</label>
-            <input class="form-control" id="CourseDesc" name="CourseDesc" type="text" placeholder="A course on how to code in Java using OOP concepts" value=""/>
+            <label for="Desc">Course Description:</label>
+            <input class="form-control" id="Desc" name="Desc" type="text" placeholder="A course on how to code in Java using OOP concepts" value=""/>
         </div>
         <div class="form-group">
             <label for="Prof">Professor Name:</label>

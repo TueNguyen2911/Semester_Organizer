@@ -30,14 +30,14 @@ var User = sequelize.define('users', {
 //todo: Define a 'Semester' model
 var Semester = sequelize.define('semesters', {
     SemID: {
-        type: Sequelize.NUMBER,
+        type: Sequelize.INTEGER,
         primaryKey: true,
         unique: true
     },
     Name: Sequelize.STRING,
     Start: Sequelize.DATEONLY,
     Finish: Sequelize.DATEONLY,
-    userID: Sequelize.NUMBER
+    userID: Sequelize.INTEGER
 });
 
 sequelize.authenticate() //connect to PostGre
@@ -67,8 +67,8 @@ module.exports.initialize = function ()
         sequelize.sync().then(() => {
             Populate_Server_Users();
             resolve(console.log("sync success"));
-        }).catch(() => {
-            reject("unable to sync the database");
+        }).catch((error) => {
+            reject("\n" + error);
         })
     });
 }
@@ -159,3 +159,136 @@ module.exports.getAllSemesters = function() {
         })
     })
 }
+//todo: Define a 'Course' model
+var Course = sequelize.define('courses', {
+    CourseID: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        unique: true
+    }, //calculate
+    CourseName: Sequelize.STRING,
+    CourseCode: Sequelize.STRING, 
+    Desc: Sequelize.STRING,
+    Prof: Sequelize.STRING,
+    SemID: Sequelize.INTEGER //calculate
+});
+//todo: 
+module.exports.getCoursesBySemID = function(SemID_para) {
+    return new Promise((resolve, reject) => {
+        Course.findAll({where: {SemID: SemID_para}})
+        .then((Courses) => {
+            resolve(Courses);
+        })
+        .catch((error) => {
+            reject(error)
+        })
+    });
+}
+getAllCourses = function() {
+    return new Promise((resolve, reject) => {
+        Course.findAll()
+        .then((allCourses) => {
+            console.log("\nCourses length: " + allCourses.length);
+            resolve(allCourses);
+        })
+        .catch((error) => {
+            reject(error);
+        })
+    })
+}
+module.exports.addCourse = function(CourseData, SemID_para) {
+    return new Promise((resolve,reject) => {
+        let lastCourseID = 0;
+        getAllCourses()
+        .then((allCourses) => {
+            if(allCourses.length > 0)
+                lastCourseID = allCourses[allCourses.length - 1]["CourseID"];
+            CourseData["CourseID"] = lastCourseID + 1;
+            CourseData["SemID"] = SemID_para;
+            Course.create(CourseData)
+            .then(() => {
+                console.log("\nA new Course is created!\n");
+                resolve();
+            }).catch(() => {
+                console.log("\n can't create new course\n");
+                reject();
+            })
+        })
+        .catch((error) => {
+            console.log("\nError from getAllCourses: " + error);
+        });
+    })
+}
+
+//todo: define Assignment 
+var Assignment = sequelize.define('assignments', {
+    AssignmentID: {
+        primaryKey: true,
+        type: Sequelize.INTEGER, 
+        unique: true
+    },
+    AssignmentName: Sequelize.STRING,
+    DueDate: Sequelize.DATEONLY,
+    DueTime: Sequelize.TIME,
+    CourseID: Sequelize.INTEGER
+});
+
+getAllAssignments = function() {
+    return new Promise((resolve, reject) => {
+        Assignment.findAll()
+        .then((allAssignments) => {
+            console.log("\nCourses length: " + allAssignments.length);
+            resolve(allAssignments);
+        })
+        .catch((error) => {
+            reject(error);
+        })
+    })
+}
+
+module.exports.getAssignmentByCourseID = function(CourseID_param) {
+    return new Promise((resolve, reject) => {
+        Assignment.findAll({where: {CourseID: CourseID_param}})
+        .then((Assignments) => {
+            console.log(Assignments);
+            resolve(Assignments);
+        })
+        .catch((error) => {
+            reject(error)
+        })
+    });
+}
+
+module.exports.addAssignment = function(AssignmentData, CourseID_param) {
+    return new Promise((resolve,reject) => {
+
+        getAllAssignments()
+        .then((allAssignments) => {
+            if(allAssignments.length > 0)
+                AssignmentData["AssignmentID"] = allAssignments[allAssignments.length - 1]["AssignmentID"] + 1;
+            else 
+                AssignmentData["AssignmentID"] = 1;
+            AssignmentData["CourseID"] = CourseID_param;
+            Assignment.create(AssignmentData)
+            .then(() => {
+                console.log("\nA new Assignment is created!\n");
+                resolve();
+            }).catch((error) => {
+                console.log("\n can't create new Ass\n");
+                console.log(error);
+                reject();
+            })
+        })
+        .catch((error) => {
+            console.log("\nError from getAllAssignments: " + error);
+        });
+    })
+}
+
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+      currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
+  }

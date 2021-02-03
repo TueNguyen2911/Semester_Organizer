@@ -1,0 +1,55 @@
+<title>
+    Welcome
+</title>
+<body> 
+    <h1> It's Assignments {{userSession.user.ChosenCourseID}} </h1>
+    {{!-- <div class="table-responsive"> <!-- css -->
+        <table class="table table-bordered table-hover semester-table">
+            <tbody>
+                <tr>
+                    <td> <a>BTP300-C++</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div> --}}
+    <div class="list-group">
+        <a href="#" class="list-group-item list-group-item-action">Cras justo odio</a>
+        <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+        <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+        <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+    </div>
+    <br>
+    <div class='container'>
+        <div class='row'>
+            <button class="glyphicon glyphicon-plus add-new-course" onclick="openCourseForm();"></button>  Add a new Assignment
+        </div>
+    </div>
+
+    <br>
+
+    <form id="assignment-form" method="post" action="/assignments/add">
+    <div class="form-group">
+            <label for="AssignmentName" >Assignment Name</label>
+            <input class="form-control" id="AssignmentName" name="AssignmentName" type="text" placeholder="Quiz1, Winter Project" value="" required/>
+        </div>
+        <div class="form-group">
+            <label for="DueDate">Due Date:</label>
+            <input class="form-control" id="DueDate" name="DueDate" type="date" placeholder="" value="" required/>
+        </div>
+        <div class="form-group">
+            <label for="DueTime">Due Time:</label>
+            <input class="form-control" id="DueTime" name="DueTime" type="time" placeholder="" min="00:00" max="24:00" value="" required/>
+        </div>
+        <div class="form-group">
+            <label for="AssignmentType">Assignment Type: </label>
+            <select class="form-select" name="AssignmentType" id="AssignmentType">
+                <option value="Group" selected>Group</option>
+                <option value="Individual">Individual</option>
+            </select>
+        </div>
+        
+    <button type="submit" class="btn btn-success pull-right">Submit</button> 
+    <button id="cancel" class="btn btn-warning pull-right" type="reset" onclick="closeCourseForm();">Cancel</button>
+  </form>
+
+</body>
